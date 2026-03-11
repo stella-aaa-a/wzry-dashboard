@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>王者热点 · 数据上传</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', 'Noto Sans SC', sans-serif;
+  background: #f5f4f0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 36px;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+h1 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #1a1814;
+}
+.sub {
+  font-size: 13px;
+  color: #9a9690;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1814;
+  margin-bottom: 6px;
+}
+input[type="text"], input[type="password"] {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e8e4de;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  margin-bottom: 16px;
+  transition: border-color 0.15s;
+  color: #1a1814;
+  background: #faf9f7;
+}
+input:focus { border-color: #e8542a; background: white; }
+textarea {
+  width: 100%;
+  height: 140px;
+  padding: 10px 14px;
+  border: 1px solid #e8e4de;
+  border-radius: 10px;
+  font-size: 12px;
+  font-family: monospace;
+  outline: none;
+  resize: vertical;
+  margin-bottom: 6px;
+  transition: border-color 0.15s;
+  color: #1a1814;
+  background: #faf9f7;
+}
+textarea:focus { border-color: #e8542a; background: white; }
+.hint {
+  font-size: 12px;
+  color: #9a9690;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+.hint code {
+  background: #f0ece6;
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: #e8542a;
+  font-size: 11px;
+}
+.btn-row { display: flex; gap: 10px; }
+button {
+  flex: 1;
+  padding: 11px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-primary { background: #e8542a; color: white; }
+.btn-primary:hover { background: #d44520; }
+.btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+.btn-outline { background: white; color: #1a1814; border: 1px solid #e8e4de; }
+.btn-outline:hover { background: #f5f4f0; }
+.status {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  display: none;
+}
+.status.success { background: #e8f8f0; color: #1a7a4a; border: 1px solid #a0e0c0; }
+.status.error { background: #fde8e0; color: #c43d15; border: 1px solid #f4b8a0; }
+.status.loading { background: #f0f4ff; color: #3040a0; border: 1px solid #c0c8f0; }
+.divider { border: none; border-top: 1px solid #e8e4de; margin: 24px 0; }
+.step-list { list-style: none; }
+.step-list li {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: #1a1814;
+  line-height: 1.6;
+}
+.step-num {
+  width: 20px; height: 20px;
+  background: #e8542a; color: white;
+  border-radius: 50%; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>⚔️ 王者热点数据上传</h1>
+  <p class="sub">每次收集完新数据，在这里上传到 GitHub，看板会自动更新。</p>
+
+  <label>GitHub 用户名</label>
+  <input type="text" id="owner" placeholder="例如：yourname">
+
+  <label>仓库名称</label>
+  <input type="text" id="repo" placeholder="例如：wzry-dashboard" value="wzry-dashboard">
+
+  <label>GitHub Token
+    <span style="font-weight:400;color:#9a9690;font-size:11px;margin-left:6px">
+      （Settings → Developer settings → Personal access tokens → 勾选 repo 权限）
+    </span>
+  </label>
+  <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxx">
+
+  <hr class="divider">
+
+  <label>粘贴热点数据（从抖音/小红书页面复制）</label>
+  <textarea id="jsonData" placeholder="在这里粘贴从油猴脚本复制的 JSON 数据..."></textarea>
+  <p class="hint">
+    去抖音/小红书页面，点击右下角 ⚔️ 按钮 → 「📋 复制数据」，然后粘贴到上方。<br>
+    或在控制台执行：<code>copy(localStorage.getItem('wzry_memes_v2'))</code>
+  </p>
+
+  <div class="btn-row">
+    <button class="btn-outline" onclick="pasteFromClipboard()">📋 粘贴</button>
+    <button class="btn-primary" id="uploadBtn" onclick="uploadData()">🚀 上传到 GitHub</button>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <hr class="divider">
+
+  <p style="font-size:13px;font-weight:600;color:#1a1814;margin-bottom:12px">📦 首次配置步骤</p>
+  <ul class="step-list">
+    <li><div class="step-num">1</div><div>在 GitHub 创建仓库，名称填 <code>wzry-dashboard</code>，勾选「Add README」</div></li>
+    <li><div class="step-num">2</div><div>把项目所有文件上传到仓库（index.html、upload.html、data/memes.json）</div></li>
+    <li><div class="step-num">3</div><div>去 <code>github.com/settings/tokens</code> 创建 Token，勾选 <code>repo</code> 权限</div></li>
+    <li><div class="step-num">4</div><div>在 Vercel 导入这个 GitHub 仓库，一键部署</div></li>
+    <li><div class="step-num">5</div><div>以后每次收集完，打开本页面上传数据，看板自动更新 ✅</div></li>
+  </ul>
+</div>
+
+<script>
+// 保存配置到 localStorage
+window.onload = () => {
+  document.getElementById('owner').value = localStorage.getItem('gh_owner') || '';
+  document.getElementById('repo').value = localStorage.getItem('gh_repo') || 'wzry-dashboard';
+  document.getElementById('token').value = localStorage.getItem('gh_token') || '';
+};
+
+function saveConfig() {
+  localStorage.setItem('gh_owner', document.getElementById('owner').value.trim());
+  localStorage.setItem('gh_repo', document.getElementById('repo').value.trim());
+  localStorage.setItem('gh_token', document.getElementById('token').value.trim());
+}
+
+async function pasteFromClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById('jsonData').value = text;
+    showStatus('📋 已粘贴', 'success');
+  } catch {
+    showStatus('请手动按 Command+V 粘贴', 'error');
+  }
+}
+
+async function uploadData() {
+  const owner = document.getElementById('owner').value.trim();
+  const repo = document.getElementById('repo').value.trim();
+  const token = document.getElementById('token').value.trim();
+  const raw = document.getElementById('jsonData').value.trim();
+
+  if (!owner || !token) { showStatus('❌ 请填写 GitHub 用户名和 Token', 'error'); return; }
+  if (!raw) { showStatus('❌ 请先粘贴数据', 'error'); return; }
+
+  let data;
+  try {
+    data = JSON.parse(raw);
+    if (!Array.isArray(data)) throw new Error();
+  } catch {
+    showStatus('❌ 数据格式有误，请重新从脚本复制', 'error');
+    return;
+  }
+
+  saveConfig();
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true;
+  btn.textContent = '上传中...';
+  showStatus('⏳ 正在上传到 GitHub...', 'loading');
+
+  try {
+    // 先获取当前文件的 SHA（更新文件需要）
+    const getRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/data/memes.json`, {
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    let sha = '';
+    if (getRes.ok) {
+      const fileInfo = await getRes.json();
+      sha = fileInfo.sha;
+    }
+
+    // 合并数据：新数据 + 现有数据去重
+    let existing = [];
+    if (sha) {
+      try {
+        const dataRes = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/data/memes.json?t=${Date.now()}`);
+        if (dataRes.ok) existing = await dataRes.json();
+      } catch {}
+    }
+
+    const existIds = new Set(existing.map(m => m.id));
+    const newItems = data.filter(m => !existIds.has(m.id));
+    const merged = [...newItems, ...existing].slice(0, 500);
+
+    // 上传
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(merged, null, 2))));
+    const putRes = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/data/memes.json`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: `更新热点数据 +${newItems.length}条 ${new Date().toLocaleString('zh-CN')}`,
+        content,
+        sha: sha || undefined
+      })
+    });
+
+    if (putRes.ok) {
+      showStatus(`✅ 成功上传！新增 ${newItems.length} 条，共 ${merged.length} 条。Vercel 将在约 30 秒后自动更新。`, 'success');
+      document.getElementById('jsonData').value = '';
+    } else {
+      const err = await putRes.json();
+      showStatus(`❌ 上传失败：${err.message}`, 'error');
+    }
+  } catch (e) {
+    showStatus(`❌ 网络错误：${e.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 上传到 GitHub';
+  }
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = `status ${type}`;
+  el.style.display = 'block';
+}
+</script>
+</body>
+</html>
