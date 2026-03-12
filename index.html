@@ -804,9 +804,12 @@ function renderCards() {
     const isXHS = m.source==='小红书';
     const isHot = (m.likes||0) >= 100000;
     const tagsHtml = (m.tags||[]).slice(0,3).map(t=>`<span class="card-tag">${t}</span>`).join('');
-    const coverHtml = m.cover
-      ? `<img src="${m.cover}" alt="" onerror="this.parentNode.innerHTML='<div class=\\'card-cover-placeholder\\'>${isXHS?'🌸':'🎵'}</div>'">`
-      : `<div class="card-cover-placeholder">${isXHS?'🌸':'🎵'}</div>`;
+    // 小红书图片走代理避免防盗链
+    const imgSrc = (m.cover && isXHS) ? `/api/img?url=${encodeURIComponent(m.cover)}` : (m.cover||'');
+    const ph = isXHS?'🌸':'🎵';
+    const coverHtml = imgSrc
+      ? `<img src="${imgSrc}" alt="" onerror="this.parentNode.innerHTML='<div class=\\'card-cover-placeholder\\'>${ph}</div>'">`
+      : `<div class="card-cover-placeholder">${ph}</div>`;
     card.innerHTML = `
       <div class="card-cover">
         ${coverHtml}
@@ -840,8 +843,11 @@ function renderRanking() {
     const pct = Math.round((m.likes||0)/max*100);
     const item = document.createElement('div');
     item.className = 'rank-item';
-    const coverInner = m.cover
-      ? `<img src="${m.cover}" alt="" onerror="this.innerHTML='${isXHS?'🌸':'🎵'}'">`
+    const rankImgSrc = (m.cover && isXHS)
+      ? `/api/img?url=${encodeURIComponent(m.cover)}`
+      : (m.cover || '');
+    const coverInner = rankImgSrc
+      ? `<img src="${rankImgSrc}" alt="" onerror="this.innerHTML='${isXHS?'🌸':'🎵'}'">`
       : (isXHS?'🌸':'🎵');
     item.innerHTML = `
       <div class="rank-num ${numClass}">${i+1}</div>
